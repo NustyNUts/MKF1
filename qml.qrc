@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>content/needleSmall.png</file>
+        <file>content/a_LCDNovaObl.ttf</file>
+        <file>SettingsQML.qml</file>
+        <file>KeyBoard.qml</file>
+        <file>Compensation.qml</file>
+        <file>MoreInfo.qml</file>
+        <file>Deviation.qml</file>
+        <file>content/backgroundNight.png</file>
+        <file>content/backgroundDay.png</file>
+        <file>NewKeyboard.qml</file>
+        <file>PasswordDial.qml</file>
+        <file>DeviTable.qml</file>
+        <file>content/HelveticaLight.ttf</file>
+        <file>MagneticField.qml</file>
+        <file>ModesPage.qml</file>
+    </qresource>
+</RCC>
