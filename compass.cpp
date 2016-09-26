@@ -714,7 +714,7 @@ void Compass::changeTrueMagneticCourse()// изменение компасног
     if(compangle->getM_tmCourse() == 0)
     {
 
-        compangle->setM_tmCourse(1);
+        compangle->setM_tmCourse(2);
         context_m->setContextProperty("trueMagneticCourse",compangle->getM_tmCourse());
     }
     else if(compangle->getM_tmCourse() == 1)
