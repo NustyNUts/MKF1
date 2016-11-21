@@ -48,7 +48,7 @@ signals:
     void angleChanged();
     void pitchChanged();
     void rollChanged();
-    void sendMsg(double);
+    void sendMsg(double,double,double,double,int);
     void compensationLabelChanged();
 
     void sklChanged(double);

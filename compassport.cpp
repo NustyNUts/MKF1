@@ -41,6 +41,7 @@ void CompassPort::on()// метод для чтения из порта и ег�
 
             QSerialPortInfo *info = new QSerialPortInfo(*portSensor);//информация о порте для отладки
             m_state=1;// порт открыт
+
             delete info;
         }
         else
@@ -52,18 +53,19 @@ void CompassPort::on()// метод для чтения из порта и ег�
 
     if(portSensor->isOpen() && portSensor->waitForReadyRead(100))// работа с открытым портом
     {
+
         QString data;
         QByteArray ByteArray,ByteArrayStart,ByteArrayFinish;
         bool startFinded = false;
-         //qDebug()<<"read from port";
         m_state = 1;
         while(m_state)// пока порт открыт
         {
             //if(portSensor->waitForReadyRead(1))
             {
+
                 qint64 byteAvail = portSensor->bytesAvailable();// просматриваем кол-во доступных байн для чтения
                 qApp->processEvents();
-                QThread::msleep(10);//усыпляем потом, чтобы не занимал времени( данные раз в 10 секунд)
+                QThread::msleep(10);//усыпляем поток, чтобы не занимал времени( данные раз в 10 секунд)
                 if(byteAvail >=23)// проверка кол-ва байт, для их обработки
                 {
                     ByteArray = portSensor->readAll();// чтение из буфера порта
@@ -81,32 +83,36 @@ void CompassPort::on()// метод для чтения из порта и ег�
                                 break;
                         }
 
-                        for(int i=40,j=15;i<56&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Roll
+//                            //m_roll = Round(toDec(two_bytes,1)*1.41,1);
+                            m_roll = QString::number((short)((ByteArray.at(6)<<8) + (ByteArray.at(5)))*360.0/65536.0,10,1).toDouble();
+                            emit rollChanged(m_roll);
+//                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
 
-                        m_roll = Round(toDec(two_bytes,1)*1.41,1);
-                        emit rollChanged(m_roll);
-                        for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
+//                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
+                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*750.0/65536.0,10,1).toDouble();
+                            emit pitchChanged(m_pitch);
+                            for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
-                        m_pitch = Round(toDec(two_bytes,1)*1.41,1);
-                        emit pitchChanged(m_pitch);
-                        for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
+                           // m_angle = Round(toDec(two_bytes,0)*1.41,1);
+                            m_angle = QString::number((short)((ByteArray.at(10)<<8) + (ByteArray.at(9)))*750.0/65536.0,10,1).toDouble();
+                            emit angleChanged(m_angle);
 
-                        m_angle = Round(toDec(two_bytes,0)*1.41,1);
-                        emit angleChanged(m_angle);
 
-                        for(int i=136,j=15;i<152&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef B
-                        m_B = Round(toDec(two_bytes,0)*1.41,1);
+                            m_B= QString::number((short)((ByteArray.at(18)<<8) + (ByteArray.at(17)))*750.0/65536.0,10,1).toDouble();
+                            emit BChanged(m_B);
 
-                        emit BChanged(m_B);
+//                            for(int i=152,j=15;i<168&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef C
+//                            m_C = Round(toDec(two_bytes,1)*3,1);
+                            m_C= QString::number((short)((ByteArray.at(20)<<8) + (ByteArray.at(19)))*750.0/65536.0,10,1).toDouble();
 
-                        for(int i=152,j=15;i<168&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef C
-                        m_C = Round(toDec(two_bytes,0)*1.41,1);
+                            emit CChanged(m_C);
 
-                        emit CChanged(m_C);
+//                            for(int i=168,j=15;i<184&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef Z
+//                            m_Z = Round(toDec(two_bytes,1)*1.41,1);
+                            m_Z= QString::number((short)((ByteArray.at(22)<<8) + (ByteArray.at(21)))*750.0/65536.0,10,1).toDouble();
+                            emit ZChanged(m_Z);
 
-                        for(int i=168,j=15;i<184&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef Z
-                        m_Z = Round(toDec(two_bytes,0)*1.41,1);
-                        emit ZChanged(m_Z);
+
                         m_state=0;
                         qApp->processEvents();
                     }
@@ -137,29 +143,47 @@ void CompassPort::on()// метод для чтения из порта и ег�
                                 else
                                     break;
                             }
-                            for(int i=40,j=15;i<56&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Roll
-
-                            m_roll = Round(toDec(two_bytes,1)*1.41,1);
+//                            //m_roll = Round(toDec(two_bytes,1)*1.41,1);
+                            m_roll = QString::number((short)((ByteArray.at(6)<<8) + (ByteArray.at(5)))*360.0/65536.0,10,1).toDouble();
                             emit rollChanged(m_roll);
-                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
+//                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
 
-                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
+//                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
+                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*700.0/65536.0,10,1).toDouble();
                             emit pitchChanged(m_pitch);
                             for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
-                            m_angle = Round(toDec(two_bytes,0)*1.41,1);
-                            emit angleChanged(m_angle);
+                           // m_angle = Round(toDec(two_bytes,0)*1.41,1);
+                            m_angle = QString::number((short)((ByteArray.at(10)<<8) + (ByteArray.at(9)))*700.0/65536.0,10,1).toDouble();
+                            static int i=0;
+                            static double tmp=0.0;
+                            if(i<=1)
+                            {
+                                qDebug()<<m_angle<<"m_angle";
+                                tmp+=m_angle;
+                                i++;
+                            }
+                            else
+                            {
+                                qDebug()<<tmp/2<<"tmp";
+                                emit angleChanged(tmp/2);
+                                i=0;
+                                tmp=0;
+                            }
 
-                            for(int i=136,j=15;i<1526&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef B
-                            m_B = Round(toDec(two_bytes,1)*1.41,1);
+
+                            m_B= QString::number((short)((ByteArray.at(18)<<8) + (ByteArray.at(17)))*700.0/65536.0,10,1).toDouble();
                             emit BChanged(m_B);
 
-                            for(int i=152,j=15;i<168&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef C
-                            m_C = Round(toDec(two_bytes,1)*1.41,1);
+//                            for(int i=152,j=15;i<168&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef C
+//                            m_C = Round(toDec(two_bytes,1)*3,1);
+                            m_C= QString::number((short)((ByteArray.at(20)<<8) + (ByteArray.at(19)))*700.0/65536.0,10,1).toDouble();
+
                             emit CChanged(m_C);
 
-                            for(int i=168,j=15;i<184&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef Z
-                            m_Z = Round(toDec(two_bytes,1)*1.41,1);
+//                            for(int i=168,j=15;i<184&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef Z
+//                            m_Z = Round(toDec(two_bytes,1)*1.41,1);
+                            m_Z= QString::number((short)((ByteArray.at(22)<<8) + (ByteArray.at(21)))*700.0/65536.0,10,1).toDouble();
                             emit ZChanged(m_Z);
 
                             m_state=0;
@@ -178,26 +202,105 @@ void CompassPort::on()// метод для чтения из порта и ег�
     }
     emit timerStart(10);
 }
-void CompassPort::sendCourse(double course)// бередача курса для БК
+double CompassPort::toDec(QBitArray bitdata,int p)//преобразования в дес. формат
+{
+    double intpart=0;
+    double fractpart=0;
+    QBitArray bit1(8),bit2(8);
+    bit1.fill(true);
+    for(int i=0;i<8;i++)
+    {
+        bit2[i]=bitdata[i];
+    }
+    int k=1;
+    if((p && bitdata[0]) || (!p && bit2 == bit1))//отрицаетельное число в обратном коде
+    {
+        bitdata=~bitdata;
+        p==1? k=-1:k=1;
+    }
+    for(int i=0,j=7;i<8 && j>=0;i++,j--)
+        intpart+=pow(2,j)*bitdata[i];
+    for(int i=8,j=1;i<16 && j<=8;i++,j++)
+        fractpart+=1/pow(2,j)*bitdata[i];
+    return (intpart+QString::number(fractpart).left(5).toDouble())*k;
+
+}
+void CompassPort::sendCourse(double course,double bx,double by,double bz,int skl)// бередача курса для БК
 {
     // открытие порта если он закрыт
     if(!portDCon->isOpen()){
         portDCon->setPortName("ttyUSB0");
         portDCon->setBaudRate(9600);
         portDCon->open(QIODevice::ReadWrite);
-        qDebug()<<portDCon->isOpen();
     }
     if(portDCon->isOpen()) // работа с портом
     {
         QByteArray dataForWrite;
         QString str;
-        // формирование строки для передачи
+        // формирование строки для передачи курса
         if(course>99)
-            str = "$RP,"+QString::number(course,10,1)+",CRLF";
+            str = "$RP,"+QString::number(course,10,1);
         else if(course>9)
-            str = "$RP,0"+QString::number(course,10,1)+",CRLF";
+            str = "$RP,0"+QString::number(course,10,1);
         else
-            str = "$RP,00"+QString::number(course,10,1)+",CRLF";
+            str = "$RP,00"+QString::number(course,10,1);
+        str+=",";
+        //----------------------
+//        //добавление в строку информации о полях
+//        //Х
+//        if(bx<0)//определяем знак
+//            str+="-";
+//        else
+//            str+="+";
+//        bx=fabs(bx);
+//        if(bx<10)
+//            str+="0";
+//        str+=QString::number(bx,10,1);
+//        //---
+//        str+=",";
+//        //Y
+//        if(by<0)//определяем знак
+//            str+="-";
+//        else
+//            str+="+";
+//        by=fabs(by);
+//        if(by<10)
+//            str+="0";
+//        str+=QString::number(by,10,1);
+//        //----
+//        str+=",";
+//        //Z
+//        if(bz<0)//определяем знак
+//            str+="-";
+//        else
+//            str+="+";
+//        bz=fabs(bz);
+//        if(bz<10)
+//            str+="0";
+//        str+=QString::number(bz,10,1);
+//        //----
+//        str+=",";
+//        // добавление склонения
+//        if(skl<0)
+//            str+="-";
+//        else
+//            str+="+";
+//        skl=abs(skl);
+//        if(skl<100)
+//           str+="0";
+//        if(skl<10)
+//            str+="0";
+//        str+=QString::number(skl,10,1);
+//        //--------
+//        str+="*";
+//        char hh=0;
+//        dataForWrite = str.toLocal8Bit();
+//        for(int i=1;i<dataForWrite.size()-1;i++)
+//            hh ^= dataForWrite.at(i);
+//        if(hh<16)
+//            str+="0";
+//        str+=QString::number(hh,16);
+        str+="CRLF";
         dataForWrite = str.toLocal8Bit();// преобразование строки к массив байт
         portDCon->write(dataForWrite,dataForWrite.size());// запись в порт для передачи
     }
@@ -446,29 +549,7 @@ void CompassPort::updateSettings(QStringList listOfSettings)// обновлен�
 }
 
 
-double CompassPort::toDec(QBitArray bitdata,int p)//преобразования в дес. формат
-{
-    double intpart=0;
-    double fractpart=0;
-    QBitArray bit1(8),bit2(8);
-    bit1.fill(true);
-    for(int i=0;i<8;i++)
-    {
-        bit2[i]=bitdata[i];
-    }
-    int k=1;
-    if((p && bitdata[0]) || (!p && bit2 == bit1))//отрицаетельное число в обратном коде
-    {
-        bitdata=~bitdata;
-        p==1? k=-1:k=1;
-    }
-    for(int i=0,j=7;i<8 && j>=0;i++,j--)
-        intpart+=pow(2,j)*bitdata[i];
-    for(int i=8,j=1;i<16 && j<=8;i++,j++)
-        fractpart+=1/pow(2,j)*bitdata[i];
-    return (intpart+QString::number(fractpart).left(5).toDouble())*k;
 
-}
 
 int CompassPort::toDecInt(QBitArray bitdata)
 {

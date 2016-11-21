@@ -2,6 +2,7 @@
 #define COMPASSANGLE_H
 
 #include <QObject>
+#include <QList>
 #include "cubic_spline.h"
 
 class Compassangle : public QObject//  класс для обработки и корректировки значений азимута

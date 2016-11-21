@@ -56,7 +56,7 @@ Rectangle {
         target:timerComp
         onTimeout: {
             compState = 0
-            compass.ledOn()
+            compass.sound()
             compass.setCompensationLabeltoDeafault()
         }
     }
@@ -243,7 +243,7 @@ Rectangle {
             }
 
             onClicked:{
-                compass.ledOn()
+                compass.sound()
                 if(compState === 0){
                     compass.initComp();
                     compState = 1;

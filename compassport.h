@@ -63,7 +63,7 @@ private:
     int index;
 
 private slots:
-    void sendCourse(double course);
+    void sendCourse(double course,double bx,double by,double bz,int skl);
     void updateSettings(QStringList listOfSettings);
     double toDec(QBitArray,int);
     int toDecInt(QBitArray);

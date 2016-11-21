@@ -1,5 +1,5 @@
 #include "compass.h"
-#include "math.h"
+
 
 Compass::Compass(QQmlContext *context, QObject *parent) :
     QObject(parent), k(0),m_comp_state(1),m_dempf(1),m_tmCourse(0),m_coef_A(0),
@@ -80,7 +80,7 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     connect(compport,SIGNAL(ZChanged(double)),this,SLOT(setZ(double)));
     //-------------------------
     connect(compport,SIGNAL(readyWriteToLog()),this,SLOT(writeTolog()));// сигнал для записи в лог угла и полей(не используется в релизных)
-    connect(this,SIGNAL(sendMsg(double)),compport,SLOT(sendCourse(double)));//коннект для отправки сообщений для БК
+    connect(this,SIGNAL(sendMsg(double,double,double,double,int)),compport,SLOT(sendCourse(double,double,double,double,int)));//коннект для отправки сообщений для БК
     /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 
     //settings signals
@@ -129,7 +129,6 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     getDevCoef();// расчет коэффицентов девиации и построение интерполяционной функции
     //установка начальных значений для пользовательских интерфейсов
     context_m->setContextProperty("compass",this);//для вызова слотов из qml
-
     context_m->setContextProperty("coef_B","0.0");
     context_m->setContextProperty("coef_C","0.0");
     context_m->setContextProperty("coef_Z","0.0");
@@ -159,6 +158,7 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     out = new QTextStream(file);
     *out<<"angle  '"<<"roll  '"<<"pitch  '"<<"B  '"<<"C  '"<<"Z  '"<<"Time '\n";
     index = 0;
+
     //---------------------
 }
 
@@ -259,6 +259,7 @@ void Compass::setBarstoDefault()//установка всех бинов в 0
 
 void Compass::setCompensationLabel(QString msg)//индикация состояния компенсации
 {
+
     m_complable = msg;
     if(msg=="НОРМА" ||msg=="ОТКАЗ"|| msg=="ВРЕМЯ"||msg=="ОШИБКА")//компенсация завершилась
     {
@@ -306,7 +307,7 @@ void Compass::setAngle(double a)// установка угла
     else
         context_m->setContextProperty("full_angle",compangle->getM_fullangleStr());
     context_m->setContextProperty("angle_value",compangle->getM_angle());
-    emit sendMsg(compangle->getCourse());// передаем сообщение для БК  с текущим курсом
+    emit sendMsg(compangle->getCourse(),m_B,m_C,m_Z,m_skl);// передаем сообщение для БК  с текущим курсом, значением полей и склонением
 }
 
 void Compass::getDevCoef()
@@ -698,6 +699,8 @@ double Compass::Round(double st,int count)// функция для округл�
 
 void Compass::initComp()// инициализация компенсации
 {
+    context_m->setContextProperty("full_angle","---.-");// если компенсация в процессе, то не индицируем курс
+    timerClearComp->stop();
     m_comp_state = true;
     context_m->setContextProperty("m_complable","КАЛИБРОВКА");
     emit compensationRequest();//сигнал порту для передачи сообщения о начале компенсации
@@ -710,7 +713,6 @@ void Compass::revert()
 
 void Compass::changeTrueMagneticCourse()// изменение компасного, магнитного истиного курсов
 {
-    //0-KK,1-MK,2-ИК
     if(compangle->getM_tmCourse() == 0)
     {
 

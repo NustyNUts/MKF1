@@ -2,14 +2,15 @@
 
 
 GpioPi::GpioPi(QObject *parent) :
-    QObject(parent),pinLed(21),pinAcc(20)
+    QObject(parent),pinLed(29),pinAcc(28)
 {
-    wiringPiSetupGpio();// инициализация портов разбери
+    wiringPiSetup();
+   // wiringPiSetupGpio();// инициализация портов разбери
     pinMode(pinLed,OUTPUT);// настройка пина на вывод
     digitalWrite(pinLed,LOW);// пишем 0, чтобы не пищал сразу
     timer = new QTimer();
     timerACC = new QTimer();
-    connect(timer,SIGNAL(timeout()),this,SLOT(ledOff()));
+    connect(timer,SIGNAL(timeout()),this,SLOT(soundOff()));
     connect(timerACC,SIGNAL(timeout()),this,SLOT(checkACC()));
     accState = 2;
     emit updateAccState(accState);
@@ -17,7 +18,6 @@ GpioPi::GpioPi(QObject *parent) :
 }
 
 void GpioPi::soundOn(){
-
     digitalWrite(pinLed,HIGH);// ключаем пищалку
     timer->start(200);//устанавливаем продолжительность звука
 }
@@ -30,6 +30,9 @@ void GpioPi::soundOff(){
 void GpioPi::checkACC(){
     if(accState!=digitalRead(pinAcc)){// проверяем состояние пина
         accState = digitalRead(pinAcc);
+
         emit updateAccState(accState);// отправляем сигнал о изменении состояние работы
+
     }
+
 }
