@@ -51,7 +51,7 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     a_str = QString::number(m_coef_A);
 
     delete inSklA;
-
+    timerSendCourse = new QTimer();
     context_m = context;
     dialComp = new DialogComp();
     compport = new CompassPort();
@@ -114,7 +114,7 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     //connect(compport,SIGNAL(revertStatusChanged(QString)),this,SLOT(setCompensationLabel(QString)));
     connect(compport,SIGNAL(compFinished()),this,SLOT(setBarstoDefault()));
     connect(this,SIGNAL(compClosed()),this,SLOT(setCompensationLabeltoDeafault()));
-
+    connect(timerSendCourse,SIGNAL(timeout()),this,SLOT(sendCourseToBK()));
     /*//////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
     connect(timerClearComp,SIGNAL(timeout()),timerClearComp,SLOT(stop()));
 
@@ -158,12 +158,13 @@ Compass::Compass(QQmlContext *context, QObject *parent) :
     out = new QTextStream(file);
     *out<<"angle  '"<<"roll  '"<<"pitch  '"<<"B  '"<<"C  '"<<"Z  '"<<"Time '\n";
     index = 0;
-
+    timerSendCourse->start(100);
     //---------------------
 }
 
 Compass::~Compass()
 {
+    delete timerSendCourse;
     delete compport;
     file->close();
     delete fileDev;
@@ -295,6 +296,11 @@ void Compass::setCompensationLabeltoDeafault()//сбрасываем индик�
     context_m->setContextProperty("m_complable",m_complable);
 }
 
+void Compass::sendCourseToBK()
+{
+    qDebug()<<"here";
+    emit sendMsg(compangle->getCourse(),m_B,m_C,m_Z,m_skl);// передаем сообщение для БК  с текущим курсом, значением полей и склонением
+}
 
 void Compass::setAngle(double a)// установка угла
 {
@@ -307,7 +313,7 @@ void Compass::setAngle(double a)// установка угла
     else
         context_m->setContextProperty("full_angle",compangle->getM_fullangleStr());
     context_m->setContextProperty("angle_value",compangle->getM_angle());
-    emit sendMsg(compangle->getCourse(),m_B,m_C,m_Z,m_skl);// передаем сообщение для БК  с текущим курсом, значением полей и склонением
+
 }
 
 void Compass::getDevCoef()

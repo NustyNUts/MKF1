@@ -76,6 +76,7 @@ signals:
 
 
 public slots:
+    void sendCourseToBK();
     void setAccState(bool);
     void setAngle(double);
     void setB(double);
@@ -207,6 +208,7 @@ protected:
 
 
 private:
+    QTimer* timerSendCourse;
     QTimer* timerClearComp;
     QString m_compColor;
     double coefAForSAhow;

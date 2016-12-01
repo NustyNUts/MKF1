@@ -274,15 +274,15 @@ Rectangle {
                anchors.right: parent.right
                z:2
            }
-        MagneticField
-           {
-               id:magField
-               width: settings.width-buttonWidth - calibBut.anchors.leftMargin * 2
-               height: settings.height
-               anchors.rightMargin: -compensationDisplay.width
-               anchors.right: parent.right
-               z:2
-           }
+//        MagneticField
+//           {
+//               id:magField
+//               width: settings.width-buttonWidth - calibBut.anchors.leftMargin * 2
+//               height: settings.height
+//               anchors.rightMargin: -compensationDisplay.width
+//               anchors.right: parent.right
+//               z:2
+//           }
         DeviTable{
             id:deviTable
             width: settings.width-buttonWidth - calibBut.anchors.leftMargin * 2
@@ -762,51 +762,51 @@ Rectangle {
                 compass.sound()
             }
         }
-        Button {
-            id: magFieldBut
-            width: settings.buttonWidth
-            height:settings.buttonHeight
-            text: qsTr("Поле")
-            anchors.topMargin: butTopMargin
-            anchors.top: pitchRoll.bottom
-            anchors.leftMargin: settingsDisplay.buttonWidth / 10
-            anchors.left: parent.left
-            style: ButtonStyle {
-                label: Text {
-                    renderType: Text.NativeRendering
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    font.family: helvetica.name
-                    font.pointSize: buttonFontSize
-                    color: window1.dayNight === false ? buttonNum === 11 ?  "black":"#7fff00" : "black"
-                    text: control.text
-                }
-                background: Rectangle {
-                    implicitWidth: 100
-                    implicitHeight: 25
-                    border.width: control.pressed? 2 : 1
-                    border.color: "#888"
-                    radius: 4
-                    color: buttonNum === 11 ? "#42e73a":dayNight === false ? "black" : "white"
+//        Button {
+//            id: magFieldBut
+//            width: settings.buttonWidth
+//            height:settings.buttonHeight
+//            text: qsTr("Поле")
+//            anchors.topMargin: butTopMargin
+//            anchors.top: pitchRoll.bottom
+//            anchors.leftMargin: settingsDisplay.buttonWidth / 10
+//            anchors.left: parent.left
+//            style: ButtonStyle {
+//                label: Text {
+//                    renderType: Text.NativeRendering
+//                    verticalAlignment: Text.AlignVCenter
+//                    horizontalAlignment: Text.AlignHCenter
+//                    font.family: helvetica.name
+//                    font.pointSize: buttonFontSize
+//                    color: window1.dayNight === false ? buttonNum === 11 ?  "black":"#7fff00" : "black"
+//                    text: control.text
+//                }
+//                background: Rectangle {
+//                    implicitWidth: 100
+//                    implicitHeight: 25
+//                    border.width: control.pressed? 2 : 1
+//                    border.color: "#888"
+//                    radius: 4
+//                    color: buttonNum === 11 ? "#42e73a":dayNight === false ? "black" : "white"
 
-                }
-            }
-            onClicked:
-            {
-                allAnimStop()
-                slideCompBack.start()
-                slideMagFielForward.start()
-                buttonNum = 11
-                compass.sound()
-            }
-        }
+//                }
+//            }
+//            onClicked:
+//            {
+//                allAnimStop()
+//                slideCompBack.start()
+//                slideMagFielForward.start()
+//                buttonNum = 11
+//                compass.sound()
+//            }
+//        }
         Button {
             id: deviDispBut
             width: settings.buttonWidth
             height:settings.buttonHeight
             text: qsTr("Девиация")
-            anchors.top: magFieldBut.bottom
-            anchors.topMargin: butTopMargin
+            anchors.topMargin: 2
+            anchors.top: pitchRoll.bottom
             anchors.leftMargin: settingsDisplay.buttonWidth / 10
 
             anchors.left: parent.left

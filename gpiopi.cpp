@@ -2,7 +2,7 @@
 
 
 GpioPi::GpioPi(QObject *parent) :
-    QObject(parent),pinLed(29),pinAcc(28)
+    QObject(parent),pinLed(29),pinAcc(28)//pinLed(29),pinAcc(28)
 {
     wiringPiSetup();
    // wiringPiSetupGpio();// инициализация портов разбери

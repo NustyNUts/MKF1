@@ -2,6 +2,7 @@
 #include <math.h>
 #include <QDebug>
 
+
 Compassangle::Compassangle(QObject *parent) : QObject(parent),K(0.6), m_fullangle(0), m_angle(0), m_fractPart(0), m_last(0), m_last2(0), m_coef_A(0), m_lastAngle(0),
     m_lastAngle1(0), m_tmCourse(0), index(0), m_con(0), m_con1(0)
 {
@@ -17,28 +18,31 @@ Compassangle::~Compassangle()
 }
 double Compassangle::correctFun(double d)// фильтр Калмана для демпфирования
 {
-    double last;
 
-    if(fabs(d-last)>50)
-    {
-        last = d;
-        return d;
-    }
-    if(angleList.size()>90)// какое кол-во отсчетов усреднять
+    int count;
+    count = 15;
+    if(angleList.size()>count)// какое кол-во отсчетов усреднять
         angleList.removeFirst();
+
     if(angleList.size())
         // обработка разрыва в 0, если переходим через 0 набор отсчетов начинается сначала
-        if(angleList.last()-d>-180 || angleList.last()-d<180)
+        if((angleList.last()-d < -180) || (angleList.last()-d>180))
+        {
             angleList.clear();
+        }
     angleList.push_back(d);
+    QList<double> tmp;
+
     double z=0;
     //сам фильтр Калмана
     for (int i=0;i<angleList.size();i++)
         z+=angleList[i];
     z /=angleList.size();
-    last=d;
+    tmp = angleList;
+    //qSort(tmp.begin(),tmp.end());
+    //qDebug()<<tmp;
+    return  K*z+(1-K)*d;//получение усредненого значения
 
-   return  K*z+(1-K)*d;//получение усредненого значения
 
 }
 
@@ -46,7 +50,7 @@ void Compassangle::setM_fullangle(double a)
 {
         if(m_dempf != 0)// демпфирование включено
         {
-            K = 0.99;// увеличиваем коеф. Калмана
+            K = 0.8;// увеличиваем коеф. Калмана
         }
         else
             K=0.6;// коеф. Калмана без демпфирования
@@ -76,19 +80,16 @@ void Compassangle::setM_fullangle(double a)
     }
     //-----------------
 
-
+     a = correctFun(a);// применяем усреднение
        a +=m_coef_A;// учитываем коеф.А
     if(m_tmCourse > 1)
         a = a + m_skl;// если истиный курс то учитываем склонение
+
     // ограничение, курс в пределах 0-360
     if(a<0)
         a+=360;
      if(a>360)
         a-=360;
-
-     a = correctFun(a);// применяем усреднение
-
-
     //------------------------------------------
      m_course = a;
     if (a!=0)

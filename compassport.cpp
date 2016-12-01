@@ -94,8 +94,18 @@ void CompassPort::on()// метод для чтения из порта и ег�
                             for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
                            // m_angle = Round(toDec(two_bytes,0)*1.41,1);
-                            m_angle = QString::number((short)((ByteArray.at(10)<<8) + (ByteArray.at(9)))*750.0/65536.0,10,1).toDouble();
-                            emit angleChanged(m_angle);
+                            for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
+                            m_angle = Round(toDec(two_bytes,0)*1.41,1);
+                            static int i=0;
+                            if(i<=1)
+                            {
+                                i++;
+                            }
+                            else
+                            {
+                                emit angleChanged(m_angle);
+                                i=0;
+                            }
 
 
                             m_B= QString::number((short)((ByteArray.at(18)<<8) + (ByteArray.at(17)))*750.0/65536.0,10,1).toDouble();
@@ -149,49 +159,43 @@ void CompassPort::on()// метод для чтения из порта и ег�
 //                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
 
 //                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
-                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*700.0/65536.0,10,1).toDouble();
+                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*750.0/65536.0,10,1).toDouble();
                             emit pitchChanged(m_pitch);
                             for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
                            // m_angle = Round(toDec(two_bytes,0)*1.41,1);
-                            m_angle = QString::number((short)((ByteArray.at(10)<<8) + (ByteArray.at(9)))*700.0/65536.0,10,1).toDouble();
+                            for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
+                            m_angle = Round(toDec(two_bytes,0)*1.41,1);
                             static int i=0;
-                            static double tmp=0.0;
                             if(i<=1)
                             {
-                                qDebug()<<m_angle<<"m_angle";
-                                tmp+=m_angle;
                                 i++;
                             }
                             else
                             {
-                                qDebug()<<tmp/2<<"tmp";
-                                emit angleChanged(tmp/2);
+                                emit angleChanged(m_angle);
                                 i=0;
-                                tmp=0;
                             }
 
 
-                            m_B= QString::number((short)((ByteArray.at(18)<<8) + (ByteArray.at(17)))*700.0/65536.0,10,1).toDouble();
+                            m_B= QString::number((short)((ByteArray.at(18)<<8) + (ByteArray.at(17)))*750.0/65536.0,10,1).toDouble();
                             emit BChanged(m_B);
 
 //                            for(int i=152,j=15;i<168&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef C
 //                            m_C = Round(toDec(two_bytes,1)*3,1);
-                            m_C= QString::number((short)((ByteArray.at(20)<<8) + (ByteArray.at(19)))*700.0/65536.0,10,1).toDouble();
+                            m_C= QString::number((short)((ByteArray.at(20)<<8) + (ByteArray.at(19)))*750.0/65536.0,10,1).toDouble();
 
                             emit CChanged(m_C);
 
 //                            for(int i=168,j=15;i<184&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //coef Z
 //                            m_Z = Round(toDec(two_bytes,1)*1.41,1);
-                            m_Z= QString::number((short)((ByteArray.at(22)<<8) + (ByteArray.at(21)))*700.0/65536.0,10,1).toDouble();
+                            m_Z= QString::number((short)((ByteArray.at(22)<<8) + (ByteArray.at(21)))*750.0/65536.0,10,1).toDouble();
                             emit ZChanged(m_Z);
 
                             m_state=0;
                             startFinded = false;
                         }
                     }
-                    //ByteArrayStart="";
-
                 }
             }
         }
