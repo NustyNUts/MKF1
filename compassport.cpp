@@ -42,6 +42,7 @@ void CompassPort::on()// метод для чтения из порта и ег�
             QSerialPortInfo *info = new QSerialPortInfo(*portSensor);//информация о порте для отладки
             m_state=1;// порт открыт
 
+
             delete info;
         }
         else
@@ -62,7 +63,6 @@ void CompassPort::on()// метод для чтения из порта и ег�
         {
             //if(portSensor->waitForReadyRead(1))
             {
-
                 qint64 byteAvail = portSensor->bytesAvailable();// просматриваем кол-во доступных байн для чтения
                 qApp->processEvents();
                 QThread::msleep(10);//усыпляем поток, чтобы не занимал времени( данные раз в 10 секунд)
@@ -236,15 +236,27 @@ void CompassPort::sendCourse(double course,double bx,double by,double bz,int skl
         portDCon->setPortName("ttyUSB0");
         portDCon->setBaudRate(9600);
         portDCon->open(QIODevice::ReadWrite);
+        QByteArray dataForWrite;
+        QString str;
+        // формирование строки для передачи курса
+        if(course>=100)
+            str = "$RP,"+QString::number(course,10,1);
+        else if(course>=10)
+            str = "$RP,0"+QString::number(course,10,1);
+        else
+            str = "$RP,00"+QString::number(course,10,1);
+        str+=",";
+        str+="CRLF";
+        qDebug()<<str;
     }
     if(portDCon->isOpen()) // работа с портом
     {
         QByteArray dataForWrite;
         QString str;
         // формирование строки для передачи курса
-        if(course>99)
+        if(course>=100)
             str = "$RP,"+QString::number(course,10,1);
-        else if(course>9)
+        else if(course>=10)
             str = "$RP,0"+QString::number(course,10,1);
         else
             str = "$RP,00"+QString::number(course,10,1);
@@ -305,6 +317,7 @@ void CompassPort::sendCourse(double course,double bx,double by,double bz,int skl
 //            str+="0";
 //        str+=QString::number(hh,16);
         str+="CRLF";
+        qDebug()<<str;
         dataForWrite = str.toLocal8Bit();// преобразование строки к массив байт
         portDCon->write(dataForWrite,dataForWrite.size());// запись в порт для передачи
     }
@@ -545,7 +558,7 @@ void CompassPort::updateSettings(QStringList listOfSettings)// обновлен�
 {
     if(portSensor->isOpen())
         portSensor->close();
-    portSensor->setPortName(listOfSettings.at(0).toLocal8Bit());
+    portSensor->setPortName("ttyUSB0");
     portSensor->setBaudRate(listOfSettings.at(1).toInt());
     portSensor->setDataBits(QSerialPort::DataBits(listOfSettings.at(2).toInt()));
     portSensor->setStopBits(QSerialPort::StopBits(listOfSettings.at(3).toInt()));
