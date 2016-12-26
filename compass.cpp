@@ -298,7 +298,7 @@ void Compass::setCompensationLabeltoDeafault()//сбрасываем индик�
 
 void Compass::sendCourseToBK()
 {
-    qDebug()<<"here";
+
     emit sendMsg(compangle->getCourse(),m_B,m_C,m_Z,m_skl);// передаем сообщение для БК  с текущим курсом, значением полей и склонением
 }
 

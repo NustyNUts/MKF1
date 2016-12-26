@@ -89,7 +89,7 @@ void CompassPort::on()// метод для чтения из порта и ег�
 //                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
 
 //                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
-                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*750.0/65536.0,10,1).toDouble();
+                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*360.0/65536.0,10,1).toDouble();
                             emit pitchChanged(m_pitch);
                             for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
@@ -159,7 +159,7 @@ void CompassPort::on()// метод для чтения из порта и ег�
 //                            for(int i=56,j=15;i<72&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Pitch
 
 //                            m_pitch = Round(toDec(two_bytes,1)*1.41,1);
-                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*750.0/65536.0,10,1).toDouble();
+                            m_pitch = QString::number((short)((ByteArray.at(8)<<8) + (ByteArray.at(7)))*360.0/65536.0,10,1).toDouble();
                             emit pitchChanged(m_pitch);
                             for(int i=72,j=15;i<88&&j>=0;i++,j--){two_bytes[j]=bitdata[i];} //Azimuth
 
@@ -246,6 +246,17 @@ void CompassPort::sendCourse(double course,double bx,double by,double bz,int skl
         else
             str = "$RP,00"+QString::number(course,10,1);
         str+=",";
+        if(skl<0)
+            str+="-";
+        else
+            str+="+";
+        skl=abs(skl);
+        if(skl<100)
+           str+="0";
+        if(skl<10)
+            str+="0";
+        str+=QString::number(skl,10,1);
+        str+=",";
         str+="CRLF";
         qDebug()<<str;
     }
@@ -296,18 +307,19 @@ void CompassPort::sendCourse(double course,double bx,double by,double bz,int skl
 //        str+=QString::number(bz,10,1);
 //        //----
 //        str+=",";
-//        // добавление склонения
-//        if(skl<0)
-//            str+="-";
-//        else
-//            str+="+";
-//        skl=abs(skl);
-//        if(skl<100)
-//           str+="0";
-//        if(skl<10)
-//            str+="0";
-//        str+=QString::number(skl,10,1);
-//        //--------
+        // добавление склонения
+        if(skl<0)
+            str+="-";
+        else
+            str+="+";
+        skl=abs(skl);
+        if(skl<100)
+           str+="0";
+        if(skl<10)
+            str+="0";
+        str+=QString::number(skl,10,1);
+        str+=",";
+        //--------
 //        str+="*";
 //        char hh=0;
 //        dataForWrite = str.toLocal8Bit();
